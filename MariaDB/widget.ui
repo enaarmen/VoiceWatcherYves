@@ -18,7 +18,7 @@
     <widget class="QTextEdit" name="tableView"/>
    </item>
    <item row="1" column="0">
-    <widget class="QTextEdit" name="note_2"/>
+    <widget class="QTextEdit" name="note"/>
    </item>
    <item row="3" column="0">
     <widget class="QPushButton" name="Nouveau">

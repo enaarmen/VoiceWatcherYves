@@ -22,8 +22,13 @@ Widget::Widget(QWidget *parent) :
         model = new QSqlTableModel(this);
         model->setTable("users");
         model->select();
-        QString *q = new QString("connected on " + db.hostName() + " with userame: " + db.userName() + ".");
-        ui->tableView->setHtml((QString) (*q));
+        QString q("connected on " + db.hostName() + " with userame: " + db.userName() + ".");
+        //ui->tableView->setHtml(q);
+        ui->tableView->setReadOnly(true);
+        QPalette *palette = new QPalette();
+        palette->setColor(QPalette::Base, Qt::white);
+        palette->setColor(QPalette::Text, Qt::darkGray);
+        ui->tableView->setHtml(q);
 }
 
 Widget::~Widget()

@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = MariaDB
 TEMPLATE = app
 
-LIBS += %%PWD/Qt-MySQL-Driver-For-Windows/libqsqlmysql4.a
+#LIBS += %%PWD/Qt-MySQL-Driver-For-Windows/libqsqlmysql4.a
 
 # The following define makes your compiler emit warnings if you use
 # any feature of Qt which has been marked as deprecated (the exact warnings
