@@ -1,0 +1,1 @@
+INSERT INTO users VALUES (0, "guigui", "gogo@gigi.com", "ababagogo", "ortho");
