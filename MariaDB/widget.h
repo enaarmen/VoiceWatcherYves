@@ -1,7 +1,8 @@
 #ifndef WIDGET_H
 #define WIDGET_H
 
-
+#include <QSqlQuery>
+#include <QSqlRecord>
 #include <QSqlTableModel>
 #include <QSqlDatabase>
 #include <QWidget>
@@ -19,11 +20,19 @@ class Widget : public QWidget
 public:
     explicit Widget(QWidget *parent = nullptr);
     ~Widget();
+    bool Connect();
+    bool PrincipalLayout();
+    bool GetNotes(unsigned int, unsigned int, unsigned int);
+
+private slots:
+    void on_Nouveau_clicked();
+
+    void on_sauvegarder_clicked();
 
 private:
-    Ui::Widget *ui;
-    QSqlTableModel *model;
-    QSqlDatabase db;
+    Ui::Widget      *ui;
+    QSqlTableModel  *model;
+    QSqlDatabase    db;
 };
 
 #endif // WIDGET_H
