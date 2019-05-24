@@ -14,7 +14,7 @@ Widget::Widget(QWidget *parent) :
     ui->setupUi(this);
     Connect();
     PrincipalLayout();
-    GetNotes(0, 10, 2);
+    GetNotes(1, 10, 2);
     /*model = new QSqlTableModel(this);
     model->setTable("users");
     model->select();*/
@@ -35,6 +35,8 @@ bool Widget::Connect() {
     if (!db.open()) {
         QMessageBox::critical(this, "Erreur db open", db.lastError().text());
         return (false);
+    } else {
+        ui->suivi->setPlainText("connecte a la database " + db.hostName());
     }
     return (true);
 }
@@ -47,7 +49,7 @@ bool Widget::PrincipalLayout() {
     palette->setColor(QPalette::Base, Qt::white);
     palette->setColor(QPalette::Text, Qt::darkGray);
     ui->suivi->setPalette(*palette);
-    ui->suivi->setHtml(q);
+    //ui->suivi->setHtml(q);
     return (true);
 }
 
@@ -55,9 +57,9 @@ bool Widget::GetNotes(unsigned int loadDown, unsigned int loadUp, unsigned int p
     QSqlQuery query;
     QSqlRecord rec;
 
-    query.prepare("select (idnote, FK_IDOrtho, FK_IDPatient, note, date) from notess where idnote >= ? and idnote <= ? and FK_IDPatient == ?;");
-    query.addBindValue(loadDown);
-    query.addBindValue(loadUp);
+    query.prepare("select (note, date) from notes where and FK_IDPatient = ?;");
+    //query.addBindValue(loadDown);
+    //query.addBindValue(loadUp);
     query.addBindValue(patient);
     if (query.exec()) {
         rec = query.record();
@@ -68,10 +70,10 @@ bool Widget::GetNotes(unsigned int loadDown, unsigned int loadUp, unsigned int p
             }
             return (true);
         } else {
-            qDebug() << "Pas de notes enregistrée.";
+           ui->suivi->append("Pas de notes enregistrée.");
         }
     } else
-        ui->suivi->setText("Notes could not been loaded: " + db.lastError().text());
+        ui->suivi->append("Aucune notes a charger.");
     return (false);
 }
 
@@ -83,14 +85,20 @@ void Widget::on_Nouveau_clicked()
 void Widget::on_sauvegarder_clicked()
 {
     QSqlQuery query;
+    QSqlRecord rec;
     QDate     date(QDate::currentDate());
 
-    query.prepare("insert into notes values (0, 1, 2, ?, ?);");
+    query.prepare("insert into notes values (0, 1, 2, '?', ?);");
     query.addBindValue(ui->note->toPlainText());
     query.addBindValue(date);
     if (query.exec()) {
         qDebug() << "Insertion reussie.";
         qDebug() << "A la date de: " << date;
-    } else
-        ui->suivi->setText("Erreur D'insertion de la note: " + db.lastError().text());
+        rec = query.record();
+        ui->suivi->setHtml(rec.value(1).toString());
+    } else {
+        ui->suivi->append("Erreur D'insertion de la note: " + db.lastError().text());
+        ui->suivi->append("Que Voici: " + ui->note->toPlainText() + ".");
+        //ui->suivi->append(db.lastError().text());
+    }
 }
