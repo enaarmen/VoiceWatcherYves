@@ -58,10 +58,10 @@ bool Widget::GetNotes(unsigned int loadDown, unsigned int loadUp, unsigned int p
     QSqlQuery query;
     QSqlRecord rec;
 
-    query.prepare("select (note, date) from notes where and FK_IDPatient = ?;");
+    query.prepare("select note, date from notes where FK_IDPatient = 2;");
     //query.addBindValue(loadDown);
     //query.addBindValue(loadUp);
-    query.addBindValue(patient);
+    //query.addBindValue(patient);
     if (query.exec()) {
         rec = query.record();
         if (rec.count() > 0) {
@@ -96,7 +96,7 @@ void Widget::on_sauvegarder_clicked()
         qDebug() << "Insertion reussie.";
         qDebug() << "A la date de: " << date;
         rec = query.record();
-        ui->suivi->setHtml(rec.value(1).toString());
+        ui->suivi->setPlainText(rec.value("note").toString());
     } else {
         ui->suivi->append("Erreur D'insertion de la note: " + query.lastError().text());
         ui->suivi->append("Que Voici: " + ui->note->toPlainText() + ".");
