@@ -27,8 +27,9 @@ Widget::~Widget()
 }
 
 bool Widget::Connect() {
-    db = QSqlDatabase::addDatabase("QMYSQL");
+    db = QSqlDatabase::addDatabase("QMYSQL3");
     db.setHostName("localhost");
+    db.setDatabaseName("users_datas");
     db.setPort(3306);
     db.setUserName("root");
     db.setPassword("enaarmen");
@@ -88,7 +89,7 @@ void Widget::on_sauvegarder_clicked()
     QSqlRecord rec;
     QDate     date(QDate::currentDate());
 
-    query.prepare("insert into notes values (0, 1, 2, '?', ?);");
+    query.prepare("insert into notes values (0, 1, 2, ?, ?);");
     query.addBindValue(ui->note->toPlainText());
     query.addBindValue(date);
     if (query.exec()) {
@@ -97,7 +98,7 @@ void Widget::on_sauvegarder_clicked()
         rec = query.record();
         ui->suivi->setHtml(rec.value(1).toString());
     } else {
-        ui->suivi->append("Erreur D'insertion de la note: " + db.lastError().text());
+        ui->suivi->append("Erreur D'insertion de la note: " + query.lastError().text());
         ui->suivi->append("Que Voici: " + ui->note->toPlainText() + ".");
         //ui->suivi->append(db.lastError().text());
     }
