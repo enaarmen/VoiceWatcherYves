@@ -36,14 +36,14 @@ bool Widget::Connect() {
     if (!db.open()) {
         QMessageBox::critical(this, "Erreur db open", db.lastError().text());
         return (false);
-    } else {
+    } /*else {
         ui->suivi->setPlainText("connecte a la database " + db.hostName());
-    }
+    }*/
     return (true);
 }
 
 bool Widget::PrincipalLayout() {
-    QString q("connected on " + db.hostName() + " with userame: " + db.userName() + ".");
+    //QString q("connected on " + db.hostName() + " with userame: " + db.userName() + ".");
     //ui->tableView->setHtml(q);
     ui->suivi->setReadOnly(true);
     QPalette *palette = new QPalette();
@@ -74,6 +74,7 @@ bool Widget::GetNotes(unsigned int loadDown, unsigned int loadUp, unsigned int p
                 ui->suivi->append("note: " + query.value(0).toString());
                 ui->suivi->append("-------------");
             }
+            ui->suivi->moveCursor(QTextCursor::MoveOperation::End);
             return (true);
         } else {
            ui->suivi->append("Pas de notes enregistrée.");
