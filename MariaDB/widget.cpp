@@ -68,7 +68,7 @@ bool Widget::GetNotes(unsigned int loadDown, unsigned int loadUp, unsigned int p
         if (rec.count() >= 0) {
             while (query.next()) {
                 //qDebug() << rec.fieldName(i);
-                ////qDebug() << rec.indexOf(rec.fieldName(i)); //rec.value(i).toString();
+                //qDebug() << rec.indexOf(rec.fieldName(i)); //rec.value(i).toString();
                 //qDebug() << "count: " << rec.count();
                 ui->suivi->append("date: " + query.value(1).toString());
                 ui->suivi->append("note: " + query.value(0).toString());
@@ -102,9 +102,8 @@ void Widget::on_sauvegarder_clicked()
         qDebug() << "A la date de: " << date;
         rec = query.record();
         //ui->suivi->setPlainText(rec.value("note").toString());
-        ui->suivi->append("date: " + date.toString());
-        ui->suivi->append("note: " + ui->note->toPlainText());
-        ui->suivi->append("-------------");
+        ui->suivi->clear();
+        GetNotes(1, 2, 3);
     } else {
         ui->suivi->append("Erreur D'insertion de la note: " + query.lastError().text());
         ui->suivi->append("Que Voici: " + ui->note->toPlainText() + ".");
