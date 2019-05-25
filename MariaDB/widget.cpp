@@ -57,17 +57,21 @@ bool Widget::PrincipalLayout() {
 bool Widget::GetNotes(unsigned int loadDown, unsigned int loadUp, unsigned int patient) {
     QSqlQuery query;
     QSqlRecord rec;
+    int         i = 0;
 
-    query.prepare("select note, date from notes where FK_IDPatient = 2;");
+    query.prepare("select note, date from notes;");
     //query.addBindValue(loadDown);
     //query.addBindValue(loadUp);
     //query.addBindValue(patient);
     if (query.exec()) {
         rec = query.record();
-        if (rec.count() > 0) {
-            for (int i = 0; i < rec.count(); i++) {
+        if (rec.count() >= 0) {
+            while (query.next()) {
                 qDebug() << rec.fieldName(i);
-                qDebug() << rec.value(i).toString();
+                qDebug() << rec.indexOf(rec.fieldName(i)); //rec.value(i).toString();
+                qDebug() << "count: " << rec.count();
+                qDebug() << "note: " << query.value(0).toString();
+                qDebug() << "date: " << query.value(1).toString();
             }
             return (true);
         } else {
