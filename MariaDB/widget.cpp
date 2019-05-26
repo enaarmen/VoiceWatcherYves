@@ -104,6 +104,7 @@ void Widget::on_sauvegarder_clicked()
         rec = query.record();
         //ui->suivi->setPlainText(rec.value("note").toString());
         ui->suivi->clear();
+        ui->note->clear();
         GetNotes(1, 2, 3);
     } else {
         ui->suivi->append("Erreur D'insertion de la note: " + query.lastError().text());
