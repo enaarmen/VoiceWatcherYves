@@ -84,11 +84,6 @@ bool Widget::GetNotes(unsigned int loadDown, unsigned int loadUp, unsigned int p
     return (false);
 }
 
-void Widget::on_Nouveau_clicked()
-{
-
-}
-
 void Widget::on_sauvegarder_clicked()
 {
     QSqlQuery query;

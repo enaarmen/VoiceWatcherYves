@@ -25,8 +25,6 @@ public:
     bool GetNotes(unsigned int, unsigned int, unsigned int);
 
 private slots:
-    void on_Nouveau_clicked();
-
     void on_sauvegarder_clicked();
 
 private:
