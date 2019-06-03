@@ -22,13 +22,17 @@ public:
     ~Widget();
     bool Connect();
     bool PrincipalLayout();
-    bool GetNotes(unsigned int, unsigned int, unsigned int);
+    bool GetNotes(unsigned int patient);
+    bool checkCredential(unsigned int idOrtho, unsigned int idpatient);
 
 private slots:
     void on_sauvegarder_clicked();
 
 private:
     Ui::Widget      *ui;
+    unsigned int    actualOrtho;
+    unsigned int    actualPatient;
+    unsigned int    actualLoad;
     QSqlTableModel  *model;
     QSqlDatabase    db;
 };

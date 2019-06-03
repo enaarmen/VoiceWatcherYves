@@ -9,16 +9,15 @@
 
 Widget::Widget(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::Widget)
+    ui(new Ui::Widget),
+    actualOrtho(0),
+    actualPatient(0),
+    actualLoad(0)
 {
     ui->setupUi(this);
     Connect();
     PrincipalLayout();
-    GetNotes(1, 10, 2);
-    /*model = new QSqlTableModel(this);
-    model->setTable("users");
-    model->select();*/
-
+    //GetNotes(1, 10, 2);
 }
 
 Widget::~Widget()
@@ -36,74 +35,86 @@ bool Widget::Connect() {
     if (!db.open()) {
         QMessageBox::critical(this, "Erreur db open", db.lastError().text());
         return (false);
-    } /*else {
-        ui->suivi->setPlainText("connecte a la database " + db.hostName());
-    }*/
+    }
     return (true);
 }
 
 bool Widget::PrincipalLayout() {
-    //QString q("connected on " + db.hostName() + " with userame: " + db.userName() + ".");
-    //ui->tableView->setHtml(q);
     ui->suivi->setReadOnly(true);
     QPalette *palette = new QPalette();
     palette->setColor(QPalette::Base, Qt::white);
     palette->setColor(QPalette::Text, Qt::darkGray);
     ui->suivi->setPalette(*palette);
-    //ui->suivi->setHtml(q);
     return (true);
 }
 
-bool Widget::GetNotes(unsigned int loadDown, unsigned int loadUp, unsigned int patient) {
-    QSqlQuery query;
-    QSqlRecord rec;
-    int         i = 0;
+bool Widget::checkCredential(unsigned int idOrtho, unsigned int idPatient)
+{
+    QSqlQuery   query;
 
-    query.prepare("select note, date from notes;");
-    //query.addBindValue(loadDown);
-    //query.addBindValue(loadUp);
-    //query.addBindValue(patient);
-    if (query.exec()) {
-        rec = query.record();
-        if (rec.count() >= 0) {
-            while (query.next()) {
-                //qDebug() << rec.fieldName(i);
-                //qDebug() << rec.indexOf(rec.fieldName(i)); //rec.value(i).toString();
-                //qDebug() << "count: " << rec.count();
-                ui->suivi->append("date: " + query.value(1).toString());
-                ui->suivi->append("note: " + query.value(0).toString());
-                ui->suivi->append("-------------");
+    if (!this->actualOrtho)
+
+    query.prepare("select FKID_ortho, FKID_patient from credentials where FKID_ortho = ? and FKID_patient = ?;");
+    query.addBindValue(idOrtho);
+    query.addBindValue(idPatient);
+    if (query.size() == 1)
+        return (true);
+    else
+        return(false);
+}
+
+bool Widget::GetNotes(unsigned int patient) {
+    QSqlQuery   query;
+    int         q;
+
+    if (checkCredential(this->actualOrtho, this->actualPatient)) {
+        query.prepare("select note, date from notes where FKID_patient = ? order by date desc limit ?;");
+        query.addBindValue(patient);
+        query.addBindValue(this->actualLoad);
+        if (query.exec()) {
+            if ((q = query.size())) {
+                while (query.next()) {
+                    ui->suivi->append("date: " + query.value(1).toString());
+                    ui->suivi->append("note: " + query.value(0).toString());
+                    ui->suivi->append("-------------");
+                }
+                if (q <= 20) {
+                    ui->suivi->moveCursor(QTextCursor::MoveOperation::End);
+                    this->actualLoad = 20;
+                } else {
+                    this->actualLoad += 20;
+                    ui->suivi->moveCursor(QTextCursor::NoMove);
+                }
+                return (true);
+            } else {
+               ui->suivi->append("Pas de notes enregistrée.");
             }
-            ui->suivi->moveCursor(QTextCursor::MoveOperation::End);
-            return (true);
-        } else {
-           ui->suivi->append("Pas de notes enregistrée.");
-        }
-    } else
-        ui->suivi->append("Aucune notes a charger.");
+        } else
+            ui->suivi->append("Aucune notes a charger.");
+    }
     return (false);
 }
 
 void Widget::on_sauvegarder_clicked()
 {
     QSqlQuery query;
-    QSqlRecord rec;
     QDate     date(QDate::currentDate());
 
-    query.prepare("insert into notes values (0, 1, 2, ?, ?);");
-    query.addBindValue(ui->note->toPlainText());
-    query.addBindValue(date);
-    if (query.exec()) {
-        qDebug() << "Insertion reussie.";
-        qDebug() << "A la date de: " << date;
-        rec = query.record();
-        //ui->suivi->setPlainText(rec.value("note").toString());
-        ui->suivi->clear();
-        ui->note->clear();
-        GetNotes(1, 2, 3);
-    } else {
-        ui->suivi->append("Erreur D'insertion de la note: " + query.lastError().text());
-        ui->suivi->append("Que Voici: " + ui->note->toPlainText() + ".");
-        //ui->suivi->append(db.lastError().text());
+    if (checkCredential(this->actualOrtho, this->actualPatient)) {
+        query.prepare("insert into notes values (0, ?, ?, ?, ?);");
+        query.addBindValue(this->actualPatient);
+        query.addBindValue(this->actualOrtho);
+        query.addBindValue(ui->note->toPlainText());
+        query.addBindValue(date);
+        if (query.exec()) {
+            ui->suivi->clear();
+            ui->note->clear();
+            this->actualLoad = 20;
+            GetNotes(this->actualPatient);
+        } else {
+            ui->suivi->clear();
+            ui->suivi->append("Erreur D'insertion de la note: " + query.lastError().text());
+            ui->suivi->append("Que Voici: " + ui->note->toPlainText() + ".");
+        }
     }
 }
